@@ -11,20 +11,12 @@
 		2A832D6F29FC483E00894E95 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A832D6E29FC483E00894E95 /* ContentView.swift */; };
 		2A832D7129FC483F00894E95 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2A832D7029FC483F00894E95 /* Assets.xcassets */; };
 		2A832D7529FC483F00894E95 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2A832D7429FC483F00894E95 /* Preview Assets.xcassets */; };
-		2A832D7F29FC483F00894E95 /* RosettaBoyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A832D7E29FC483F00894E95 /* RosettaBoyTests.swift */; };
-		2A832D8929FC484000894E95 /* RosettaBoyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A832D8829FC484000894E95 /* RosettaBoyUITests.swift */; };
-		2A832D8B29FC484000894E95 /* RosettaBoyUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A832D8A29FC484000894E95 /* RosettaBoyUITestsLaunchTests.swift */; };
+		2A832D9929FC486900894E95 /* CPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A832D9829FC486900894E95 /* CPU.swift */; };
+		2A832D9B29FC489B00894E95 /* CPUTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A832D9A29FC489B00894E95 /* CPUTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		2A832D7B29FC483F00894E95 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2A832D6129FC483E00894E95 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 2A832D6829FC483E00894E95;
-			remoteInfo = RosettaBoy;
-		};
-		2A832D8529FC484000894E95 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2A832D6129FC483E00894E95 /* Project object */;
 			proxyType = 1;
@@ -41,10 +33,9 @@
 		2A832D7229FC483F00894E95 /* RosettaBoy.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RosettaBoy.entitlements; sourceTree = "<group>"; };
 		2A832D7429FC483F00894E95 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2A832D7A29FC483F00894E95 /* RosettaBoyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RosettaBoyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2A832D7E29FC483F00894E95 /* RosettaBoyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosettaBoyTests.swift; sourceTree = "<group>"; };
-		2A832D8429FC484000894E95 /* RosettaBoyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RosettaBoyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2A832D8829FC484000894E95 /* RosettaBoyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosettaBoyUITests.swift; sourceTree = "<group>"; };
-		2A832D8A29FC484000894E95 /* RosettaBoyUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosettaBoyUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		2A832D9829FC486900894E95 /* CPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPU.swift; sourceTree = "<group>"; };
+		2A832D9A29FC489B00894E95 /* CPUTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUTests.swift; sourceTree = "<group>"; };
+		2A832D9C29FC62D500894E95 /* Readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,22 +53,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2A832D8129FC484000894E95 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		2A832D6029FC483E00894E95 = {
 			isa = PBXGroup;
 			children = (
+				2A832D9C29FC62D500894E95 /* Readme.md */,
 				2A832D6B29FC483E00894E95 /* RosettaBoy */,
 				2A832D7D29FC483F00894E95 /* RosettaBoyTests */,
-				2A832D8729FC484000894E95 /* RosettaBoyUITests */,
 				2A832D6A29FC483E00894E95 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -87,7 +71,6 @@
 			children = (
 				2A832D6929FC483E00894E95 /* RosettaBoy.app */,
 				2A832D7A29FC483F00894E95 /* RosettaBoyTests.xctest */,
-				2A832D8429FC484000894E95 /* RosettaBoyUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,6 +78,7 @@
 		2A832D6B29FC483E00894E95 /* RosettaBoy */ = {
 			isa = PBXGroup;
 			children = (
+				2A832D9729FC485200894E95 /* Source */,
 				2A832D6C29FC483E00894E95 /* RosettaBoyApp.swift */,
 				2A832D6E29FC483E00894E95 /* ContentView.swift */,
 				2A832D7029FC483F00894E95 /* Assets.xcassets */,
@@ -115,18 +99,17 @@
 		2A832D7D29FC483F00894E95 /* RosettaBoyTests */ = {
 			isa = PBXGroup;
 			children = (
-				2A832D7E29FC483F00894E95 /* RosettaBoyTests.swift */,
+				2A832D9A29FC489B00894E95 /* CPUTests.swift */,
 			);
 			path = RosettaBoyTests;
 			sourceTree = "<group>";
 		};
-		2A832D8729FC484000894E95 /* RosettaBoyUITests */ = {
+		2A832D9729FC485200894E95 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				2A832D8829FC484000894E95 /* RosettaBoyUITests.swift */,
-				2A832D8A29FC484000894E95 /* RosettaBoyUITestsLaunchTests.swift */,
+				2A832D9829FC486900894E95 /* CPU.swift */,
 			);
-			path = RosettaBoyUITests;
+			path = Source;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -167,24 +150,6 @@
 			productReference = 2A832D7A29FC483F00894E95 /* RosettaBoyTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		2A832D8329FC484000894E95 /* RosettaBoyUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 2A832D9429FC484000894E95 /* Build configuration list for PBXNativeTarget "RosettaBoyUITests" */;
-			buildPhases = (
-				2A832D8029FC484000894E95 /* Sources */,
-				2A832D8129FC484000894E95 /* Frameworks */,
-				2A832D8229FC484000894E95 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				2A832D8629FC484000894E95 /* PBXTargetDependency */,
-			);
-			name = RosettaBoyUITests;
-			productName = RosettaBoyUITests;
-			productReference = 2A832D8429FC484000894E95 /* RosettaBoyUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -199,10 +164,6 @@
 						CreatedOnToolsVersion = 14.3;
 					};
 					2A832D7929FC483F00894E95 = {
-						CreatedOnToolsVersion = 14.3;
-						TestTargetID = 2A832D6829FC483E00894E95;
-					};
-					2A832D8329FC484000894E95 = {
 						CreatedOnToolsVersion = 14.3;
 						TestTargetID = 2A832D6829FC483E00894E95;
 					};
@@ -223,7 +184,6 @@
 			targets = (
 				2A832D6829FC483E00894E95 /* RosettaBoy */,
 				2A832D7929FC483F00894E95 /* RosettaBoyTests */,
-				2A832D8329FC484000894E95 /* RosettaBoyUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -245,13 +205,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		2A832D8229FC484000894E95 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -261,6 +214,7 @@
 			files = (
 				2A832D6F29FC483E00894E95 /* ContentView.swift in Sources */,
 				2A832D6D29FC483E00894E95 /* RosettaBoyApp.swift in Sources */,
+				2A832D9929FC486900894E95 /* CPU.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,16 +222,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A832D7F29FC483F00894E95 /* RosettaBoyTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		2A832D8029FC484000894E95 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				2A832D8B29FC484000894E95 /* RosettaBoyUITestsLaunchTests.swift in Sources */,
-				2A832D8929FC484000894E95 /* RosettaBoyUITests.swift in Sources */,
+				2A832D9B29FC489B00894E95 /* CPUTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,11 +233,6 @@
 			isa = PBXTargetDependency;
 			target = 2A832D6829FC483E00894E95 /* RosettaBoy */;
 			targetProxy = 2A832D7B29FC483F00894E95 /* PBXContainerItemProxy */;
-		};
-		2A832D8629FC484000894E95 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 2A832D6829FC483E00894E95 /* RosettaBoy */;
-			targetProxy = 2A832D8529FC484000894E95 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -528,50 +468,6 @@
 			};
 			name = Release;
 		};
-		2A832D9529FC484000894E95 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GLB476Z655;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.outrowender.RosettaBoyUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = RosettaBoy;
-			};
-			name = Debug;
-		};
-		2A832D9629FC484000894E95 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GLB476Z655;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.outrowender.RosettaBoyUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = RosettaBoy;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -598,15 +494,6 @@
 			buildConfigurations = (
 				2A832D9229FC484000894E95 /* Debug */,
 				2A832D9329FC484000894E95 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		2A832D9429FC484000894E95 /* Build configuration list for PBXNativeTarget "RosettaBoyUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				2A832D9529FC484000894E95 /* Debug */,
-				2A832D9629FC484000894E95 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
