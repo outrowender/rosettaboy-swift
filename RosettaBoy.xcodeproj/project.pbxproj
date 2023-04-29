@@ -33,9 +33,11 @@
 		2A832D7229FC483F00894E95 /* RosettaBoy.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RosettaBoy.entitlements; sourceTree = "<group>"; };
 		2A832D7429FC483F00894E95 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2A832D7A29FC483F00894E95 /* RosettaBoyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RosettaBoyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2A832D9829FC486900894E95 /* CPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPU.swift; sourceTree = "<group>"; };
-		2A832D9A29FC489B00894E95 /* CPUTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUTests.swift; sourceTree = "<group>"; };
+		2A832D9829FC486900894E95 /* CPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPU.swift; sourceTree = "<group>"; wrapsLines = 0; };
+		2A832D9A29FC489B00894E95 /* CPUTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUTests.swift; sourceTree = "<group>"; wrapsLines = 0; };
 		2A832D9C29FC62D500894E95 /* Readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
+		2AD26A0C29FD85CB003459BB /* RosettaBoyTestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = RosettaBoyTestPlan.xctestplan; sourceTree = "<group>"; };
+		2AD26A0D29FD8602003459BB /* RosettaBoy.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = RosettaBoy.xctestplan; path = RosettaBoyTests/RosettaBoy.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +61,7 @@
 		2A832D6029FC483E00894E95 = {
 			isa = PBXGroup;
 			children = (
+				2AD26A0D29FD8602003459BB /* RosettaBoy.xctestplan */,
 				2A832D9C29FC62D500894E95 /* Readme.md */,
 				2A832D6B29FC483E00894E95 /* RosettaBoy */,
 				2A832D7D29FC483F00894E95 /* RosettaBoyTests */,
@@ -99,6 +102,7 @@
 		2A832D7D29FC483F00894E95 /* RosettaBoyTests */ = {
 			isa = PBXGroup;
 			children = (
+				2AD26A0C29FD85CB003459BB /* RosettaBoyTestPlan.xctestplan */,
 				2A832D9A29FC489B00894E95 /* CPUTests.swift */,
 			);
 			path = RosettaBoyTests;

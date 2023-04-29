@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "ADABDD31-1A04-46F0-99F2-C9935C9AD4E9",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:RosettaBoy.xcodeproj",
+        "identifier" : "2A832D7929FC483F00894E95",
+        "name" : "RosettaBoyTests"
+      }
+    }
+  ],
+  "version" : 1
+}
