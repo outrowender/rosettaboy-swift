@@ -108,6 +108,7 @@ final class CPUTests: XCTestCase {
     func testExecuteAddShouldDoFalseForOverflowWhenItsNot() throws {
         // GIVEN
         var cpu = CPU()
+        cpu.a = 0b0
         cpu.c = 0b0000_0001
         
         // WHEN
@@ -155,4 +156,75 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(cpu.f.carry)
     }
     
+    func testExecuteAddHLShouldDealWithOverflow() throws {
+        // GIVEN
+        var cpu = CPU()
+        
+        cpu.bc = 0b0000_0001_0000_0001
+        cpu.hl = 0b0001_0001_0001_0011
+        
+        // WHEN
+        cpu.execute(.ADDHL(.BC))
+    
+        // THEN
+        XCTAssertEqual(cpu.hl, 0b0001_0010_0001_0100)
+        XCTAssertFalse(cpu.f.zero)
+        XCTAssertFalse(cpu.f.subtract)
+        XCTAssertFalse(cpu.f.halfCarry)
+        XCTAssertFalse(cpu.f.carry)
+    }
+    
+    func testExecuteAddHLShouldDealWithOverflowWithHalfCarry() throws {
+        // GIVEN
+        var cpu = CPU()
+        
+        cpu.bc = 0b0000_0111_1111_1111
+        cpu.hl = 0b1
+        
+        // WHEN
+        cpu.execute(.ADDHL(.BC))
+    
+        // THEN
+        XCTAssertEqual(cpu.hl, 0b0000_1000_0000_0000)
+        XCTAssertFalse(cpu.f.zero)
+        XCTAssertFalse(cpu.f.subtract)
+        XCTAssertTrue(cpu.f.halfCarry)
+        XCTAssertFalse(cpu.f.carry)
+    }
+    
+    func testExecuteAddHLShouldDealWithOverflowWithOverflow() throws {
+        // GIVEN
+        var cpu = CPU()
+        
+        cpu.bc = 0b1111_1111_1111_1111
+        cpu.hl = 0b1
+        
+        // WHEN
+        cpu.execute(.ADDHL(.BC))
+    
+        // THEN
+        XCTAssertEqual(cpu.hl, 0b0)
+        XCTAssertTrue(cpu.f.zero)
+        XCTAssertFalse(cpu.f.subtract)
+        XCTAssertTrue(cpu.f.halfCarry)
+        XCTAssertTrue(cpu.f.carry)
+    }
+    
+    func testExecuteAddHLShouldDealWithOverflowWithFullOverflow() throws {
+        // GIVEN
+        var cpu = CPU()
+        
+        cpu.bc = 0b1111_1111_1111_1111
+        cpu.hl = 0b0000_0000_0000_0010
+        
+        // WHEN
+        cpu.execute(.ADDHL(.BC))
+    
+        // THEN
+        XCTAssertEqual(cpu.hl, 0b1)
+        XCTAssertFalse(cpu.f.zero)
+        XCTAssertFalse(cpu.f.subtract)
+        XCTAssertTrue(cpu.f.halfCarry)
+        XCTAssertTrue(cpu.f.carry)
+    }
 }

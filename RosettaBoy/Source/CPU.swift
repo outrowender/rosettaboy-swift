@@ -99,11 +99,15 @@ extension CPU {
 
     enum Instruction {
         case ADD(ArithmeticTarget)
-        case ADDHL(ArithmeticTarget)
+        case ADDHL(ArithmeticStackTarget)
     }
 
     enum ArithmeticTarget {
         case A, B, C, D, E, H, L
+    }
+    
+    enum ArithmeticStackTarget {
+        case AF, BC, DE, HL
     }
 }
 
@@ -132,20 +136,18 @@ extension CPU {
             }
         case .ADDHL(let target):
             switch target {
-            case .A:
-                print("TODO")
-            case .B:
-                print("TODO")
-            case .C:
-                print("TODO")
-            case .D:
-                print("TODO")
-            case .E:
-                print("TODO")
-            case .H:
-                print("TODO")
-            case .L:
-                print("TODO")
+            case .AF:
+                let newValue = self.addhl(self.af)
+                self.hl = newValue
+            case .BC:
+                let newValue = self.addhl(self.bc)
+                self.hl = newValue
+            case .DE:
+                let newValue = self.addhl(self.de)
+                self.hl = newValue
+            case .HL:
+                // TODO: implement
+                print("Not implemented")
             }
         }
     }
@@ -161,16 +163,50 @@ extension CPU {
     }
     
     // MARK: - ADDHL
-    mutating func addhl(_ value: UInt8) -> UInt8 {
-        let (partialValue, overflow) = self.a.addingReportingOverflow(value)
+    mutating func addhl(_ value: UInt16) -> UInt16 {
+        let (partialValue, overflow) = self.hl.addingReportingOverflow(value)
+        self.f.zero = partialValue == 0
+        self.f.subtract = false
+        self.f.carry = overflow
+        let mask = UInt16(0b111_1111_1111)
+        self.f.halfCarry = (self.hl & mask) + (value & mask) > mask;
+        return partialValue
+    }
+    
+    mutating func adc(_ value: UInt8) -> UInt8 {
+        var (partialValue, overflow) = self.a.addingReportingOverflow(value)
+        if overflow {
+            partialValue = partialValue.addingReportingOverflow(1).partialValue
+        }
         self.f.zero = partialValue == 0
         self.f.subtract = false
         self.f.carry = overflow
         self.f.halfCarry = (self.a & 0xf) + (value & 0xf) > 0xf
         return partialValue
-        
-        return value
     }
+    
+    mutating func sub(_ value: UInt8) -> UInt8 {
+        let (partialValue, overflow) = value.subtractingReportingOverflow(self.a)
+        self.f.zero = partialValue == 0
+        self.f.subtract = true
+        self.f.carry = overflow
+        self.f.halfCarry = (self.a & 0xf) + (value & 0xf) > 0xf
+        return partialValue
+    }
+    
+    mutating func subc(_ value: UInt8) -> UInt8 {
+        var (partialValue, overflow) = value.subtractingReportingOverflow(self.a)
+        if overflow {
+            partialValue = partialValue.subtractingReportingOverflow(1).partialValue
+        }
+        self.f.zero = partialValue == 0
+        self.f.subtract = false
+        self.f.carry = overflow
+        self.f.halfCarry = (self.a & 0xf) + (value & 0xf) > 0xf
+        return partialValue
+    }
+    
+    
 }
 
 
