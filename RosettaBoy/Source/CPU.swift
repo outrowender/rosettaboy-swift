@@ -154,56 +154,57 @@ extension CPU {
     
     // MARK: - ADD
     mutating func add(_ value: UInt8) -> UInt8 {
-        let (partialValue, overflow) = self.a.addingReportingOverflow(value)
-        self.f.zero = partialValue == 0
+        let (add, carry) = self.a.addingReportingOverflow(value)
+        self.f.zero = add == 0
         self.f.subtract = false
-        self.f.carry = overflow
+        self.f.carry = carry
         self.f.halfCarry = (self.a & 0xf) + (value & 0xf) > 0xf
-        return partialValue
+        return add
     }
     
     // MARK: - ADDHL
     mutating func addhl(_ value: UInt16) -> UInt16 {
-        let (partialValue, overflow) = self.hl.addingReportingOverflow(value)
-        self.f.zero = partialValue == 0
+        let (add, carry) = self.hl.addingReportingOverflow(value)
+        
+        self.f.zero = (add == 0)
         self.f.subtract = false
-        self.f.carry = overflow
+        self.f.carry = carry
         let mask = UInt16(0b111_1111_1111)
         self.f.halfCarry = (self.hl & mask) + (value & mask) > mask;
-        return partialValue
+        return add
     }
     
     mutating func adc(_ value: UInt8) -> UInt8 {
-        var (partialValue, overflow) = self.a.addingReportingOverflow(value)
-        if overflow {
-            partialValue = partialValue.addingReportingOverflow(1).partialValue
-        }
-        self.f.zero = partialValue == 0
+        let fcarry: UInt8 = self.f.carry ? 0b1 : 0b0
+        let (add, carry) = self.a.addingReportingOverflow(value)
+        let (add2, carry2) = add.addingReportingOverflow(fcarry)
+        
+        self.f.zero = add2 == 0
         self.f.subtract = false
-        self.f.carry = overflow
-        self.f.halfCarry = (self.a & 0xf) + (value & 0xf) > 0xf
-        return partialValue
+        self.f.carry = carry || carry2
+        self.f.halfCarry = ((self.a & 0xf) + (value & 0xf) + fcarry) > 0xf
+        return add2
     }
     
     mutating func sub(_ value: UInt8) -> UInt8 {
-        let (partialValue, overflow) = value.subtractingReportingOverflow(self.a)
-        self.f.zero = partialValue == 0
+        let (add, carry) = self.a.subtractingReportingOverflow(value)
+        self.f.zero = (add == 0)
         self.f.subtract = true
-        self.f.carry = overflow
-        self.f.halfCarry = (self.a & 0xf) + (value & 0xf) > 0xf
-        return partialValue
+        self.f.carry = carry
+        self.f.halfCarry = (self.a & 0xf) < (value & 0xf)
+        return add
     }
     
-    mutating func subc(_ value: UInt8) -> UInt8 {
-        var (partialValue, overflow) = value.subtractingReportingOverflow(self.a)
-        if overflow {
-            partialValue = partialValue.subtractingReportingOverflow(1).partialValue
-        }
-        self.f.zero = partialValue == 0
-        self.f.subtract = false
-        self.f.carry = overflow
-        self.f.halfCarry = (self.a & 0xf) + (value & 0xf) > 0xf
-        return partialValue
+    mutating func sbc(_ value: UInt8) -> UInt8 {
+        let fcarry: UInt8 = self.f.carry ? 0b1 : 0b0        
+        let (sub, carry) = self.a.subtractingReportingOverflow(value)
+        let (sub2, carry2) = sub.subtractingReportingOverflow(fcarry)
+
+        self.f.zero = (sub2 == 0)
+        self.f.subtract = true
+        self.f.carry = carry || carry2
+        self.f.halfCarry = (self.a & 0xf) < (value & 0xf) + fcarry
+        return sub2
     }
     
     
