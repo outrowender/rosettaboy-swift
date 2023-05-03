@@ -152,7 +152,7 @@ extension CPU {
         }
     }
     
-    // MARK: - ADD
+    // MARK: - Add
     mutating func add(_ value: UInt8) -> UInt8 {
         let (add, carry) = self.a.addingReportingOverflow(value)
         self.f.zero = add == 0
@@ -162,7 +162,7 @@ extension CPU {
         return add
     }
     
-    // MARK: - ADDHL
+    // MARK: - Add to HL register
     mutating func addhl(_ value: UInt16) -> UInt16 {
         let (add, carry) = self.hl.addingReportingOverflow(value)
         
@@ -174,6 +174,7 @@ extension CPU {
         return add
     }
     
+    // MARK: - Add with Carry
     mutating func adc(_ value: UInt8) -> UInt8 {
         let fcarry: UInt8 = self.f.carry ? 0b1 : 0b0
         let (add, carry) = self.a.addingReportingOverflow(value)
@@ -186,6 +187,7 @@ extension CPU {
         return add2
     }
     
+    // MARK: - Subtract
     mutating func sub(_ value: UInt8) -> UInt8 {
         let (add, carry) = self.a.subtractingReportingOverflow(value)
         self.f.zero = (add == 0)
@@ -195,8 +197,9 @@ extension CPU {
         return add
     }
     
+    // MARK: - Subtract with Carry
     mutating func sbc(_ value: UInt8) -> UInt8 {
-        let fcarry: UInt8 = self.f.carry ? 0b1 : 0b0        
+        let fcarry: UInt8 = self.f.carry ? 0b1 : 0b0
         let (sub, carry) = self.a.subtractingReportingOverflow(value)
         let (sub2, carry2) = sub.subtractingReportingOverflow(fcarry)
 
@@ -207,6 +210,114 @@ extension CPU {
         return sub2
     }
     
+    // MARK: - Logical AND
+    mutating func and(_ value: UInt8) -> UInt8 {
+        let and = self.a & value
+        self.f.zero = (and == 0)
+        self.f.subtract = false
+        self.f.carry = false
+        self.f.halfCarry = true
+        return and
+    }
+    
+    // MARK: - Logical OR
+    mutating func or(_ value: UInt8) -> UInt8 {
+        let or = self.a | value
+        self.f.zero = (or == 0)
+        self.f.subtract = false
+        self.f.carry = false
+        self.f.halfCarry = false
+        return or
+    }
+    
+    // MARK: - Logical XOR
+    mutating func xor(_ value: UInt8) -> UInt8 {
+        let xor = self.a ^ value
+        self.f.zero = (xor == 0)
+        self.f.subtract = false
+        self.f.carry = false
+        self.f.halfCarry = false
+        return xor
+    }
+    
+    // MARK: - Compare
+    mutating func cp(_ value: UInt8) {
+        self.f.zero = self.a == value
+        self.f.subtract = true
+        self.f.carry = self.a < value
+        self.f.halfCarry = (self.a & 0xf) < (value & 0xf)
+    }
+    
+    // MARK: - Increment 8-bit
+    mutating func inc8(_ value: UInt8) -> UInt8 {
+        let inc = value & 0b1
+        self.f.zero = (inc == 0)
+        self.f.subtract = false
+        self.f.halfCarry = (value & 0xf) == 0xf
+        return inc
+    }
+    
+    // MARK: - Decrement 8-bit
+    mutating func dec8(_ value: UInt8) -> UInt8 {
+        let dec = value - 0b1;
+        self.f.zero = (dec == 0);
+        self.f.subtract = true;
+        self.f.halfCarry = (value & 0xf) == 0x0;
+        return dec
+    }
+    
+    // MARK: - Complement Carry Flag
+    mutating func ccf() {
+        self.f.subtract = false
+        self.f.carry = !self.f.carry
+        self.f.halfCarry = false
+    }
+    
+    // MARK: - Set Carry Flag
+    mutating func scf() {
+        self.f.subtract = false
+        self.f.carry = true
+        self.f.halfCarry = false
+    }
+    
+    // MARK: - Rotate right A
+    mutating func rra() {
+        self.a = self.a >> 1
+    }
+    
+    // MARK: - Rotate left A
+    mutating func rla() {
+        self.a = self.a << 1
+    }
+    
+    
+    mutating func RRCA() {}
+    mutating func RRLA() {}
+    
+    // MARK: - Complement
+    mutating func cpl() {
+        self.a = self.a.byteSwapped
+    }
+    
+    // MARK: - Bit test
+    mutating func bit() {
+        
+    }
+    
+    // MARK: - Bit reset
+    mutating func reset(_ target: ArithmeticTarget) {
+        
+    }
+    
+    mutating func SET() {}
+    mutating func SRL() {}
+    mutating func RR() {}
+    mutating func RL() {}
+    mutating func RRC() {}
+    mutating func RLC() {}
+    mutating func SRA() {}
+    mutating func SLA() {}
+    mutating func SWAP() {}
     
 }
 
