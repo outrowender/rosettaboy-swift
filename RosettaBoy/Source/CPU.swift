@@ -109,6 +109,10 @@ extension CPU {
     enum ArithmeticStackTarget {
         case AF, BC, DE, HL
     }
+    
+    enum BitPosition: Int8 {
+        case B0, B1, B2, B3, B4, B5, B6, B7
+    }
 }
 
 // MARK: - CPU Execute logic
@@ -290,9 +294,31 @@ extension CPU {
         self.a = self.a << 1
     }
     
+    // MARK: - Rotate right A not throug carry
+    mutating func rrca() {
+        let ca: UInt8 = self.f.carry ? 1 : 0 << 7
+        let rotated = ca | (self.a >> 1)
+        
+        self.f.zero = rotated == 0
+        self.f.subtract = false
+        self.f.halfCarry = false
+        self.f.carry = (self.a & 0b1) == 0b1
+        
+        self.a = rotated
+    }
     
-    mutating func RRCA() {}
-    mutating func RRLA() {}
+    // MARK: - Rotate left A not throug carry
+    mutating func rrla() {
+        let ca: UInt8 = self.f.carry ? 0x80 : 0
+        let rotated = ca | (self.a << 1)
+        
+        self.f.zero = rotated == 0
+        self.f.subtract = false
+        self.f.halfCarry = false
+        self.f.carry = (self.a & 0x80) == 0x80
+        
+        self.a = rotated
+    }
     
     // MARK: - Complement
     mutating func cpl() {
@@ -300,24 +326,122 @@ extension CPU {
     }
     
     // MARK: - Bit test
-    mutating func bit() {
-        
+    mutating func bit(_ value: UInt8, position: BitPosition) {
+        let result = (value >> position.rawValue) & 0b1
+        self.f.zero = result == 0
+        self.f.subtract = false
+        self.f.halfCarry = true
     }
     
     // MARK: - Bit reset
-    mutating func reset(_ target: ArithmeticTarget) {
-        
+    mutating func reset(_ value: UInt8, position: BitPosition) -> UInt8 {
+        let bitMask: UInt8 = ~(1 << position.rawValue)
+        return value & bitMask
     }
     
-    mutating func SET() {}
-    mutating func SRL() {}
-    mutating func RR() {}
-    mutating func RL() {}
-    mutating func RRC() {}
-    mutating func RLC() {}
-    mutating func SRA() {}
-    mutating func SLA() {}
-    mutating func SWAP() {}
+    // MARK: - Bit set
+    mutating func set(_ value: UInt8, position: BitPosition) -> UInt8 {
+        value | (1 << position.rawValue)
+    }
+    
+    // MARK: - Shift right logical
+    mutating func srl(_ value: UInt8) -> UInt8 {
+        let result: UInt8 = value >> 1
+        
+        self.f.zero = result == 0
+        self.f.subtract = false
+        self.f.halfCarry = false
+        self.f.carry = (value & 0b1) == 0b1
+        
+        return result
+    }
+    
+    // MARK: - Rotate right
+    mutating func rr(_ value: UInt8) -> UInt8 {
+        let newValue: UInt8 = value >> 1
+        
+        self.f.zero = newValue == 0
+        self.f.subtract = false
+        self.f.halfCarry = false
+        self.f.carry = (value & 0b1) == 0b1
+        
+        return newValue
+    }
+    
+    // MARK: - Rotate left
+    mutating func rl(_ value: UInt8) -> UInt8 {
+        let newValue: UInt8 = value << 1
+        
+        self.f.zero = newValue == 0
+        self.f.subtract = false
+        self.f.halfCarry = false
+        self.f.carry = (value & 0b1) == 0b1
+        
+        return newValue
+    }
+    
+    // MARK: - Rotate right not throug carry
+    mutating func rrc(_ value: UInt8) -> UInt8 {
+        let ca: UInt8 = self.f.carry ? 1 : 0 << 7
+        let rotated = ca | (value >> 1)
+        
+        self.f.zero = rotated == 0
+        self.f.subtract = false
+        self.f.halfCarry = false
+        self.f.carry = (value & 0b1) == 0b1
+        
+        return rotated
+    }
+    
+    // MARK: - Rotate left not throug carry
+    mutating func rrl(_ value: UInt8) -> UInt8 {
+        let ca: UInt8 = self.f.carry ? 0x80 : 0
+        let rotated = ca | (value << 1)
+        
+        self.f.zero = rotated == 0
+        self.f.subtract = false
+        self.f.halfCarry = false
+        self.f.carry = (value & 0x80) == 0x80
+        
+        return rotated
+    }
+    
+    // MARK: - Shift right arithmetic
+    mutating func sra(_ value: UInt8) -> UInt8 {
+        let msb: UInt8 = value & 0x80
+        let newValue: UInt8 = msb | (value >> 1)
+        
+        self.f.zero = newValue == 0
+        self.f.subtract = false
+        self.f.halfCarry = false
+        self.f.carry = (value & 0b1) == 0b1
+        
+        return newValue
+    }
+    
+    // MARK: - Shift right arithmetic
+    mutating func sla(_ value: UInt8) -> UInt8 {
+        let newValue: UInt8 = value << 1
+          
+          self.f.zero = newValue == 0
+          self.f.subtract = false
+          self.f.halfCarry = false
+          self.f.carry = (value & 0x80) == 0x80
+          
+          return newValue
+    }
+    
+    // MARK: - Swap nibbles
+    mutating func swap(value: UInt8) -> UInt8 {
+        let newValue: UInt8 = ((value & 0x0F) << 4) | ((value & 0xF0) >> 4)
+        
+        self.f.zero = newValue == 0
+        self.f.subtract = false
+        self.f.halfCarry = false
+        self.f.carry = false
+        
+        return newValue
+    }
     
 }
 
