@@ -7,26 +7,28 @@
 
 import Foundation
 
+// MARK: - CPU bit Architecture
 struct CPU {
-    // MARK: - 8-bit Registers
     
+    init() { }
+    
+    // 8-bit Registers
     var a: UInt8 = 0b0000_0000
     var b: UInt8 = 0b0000_0000
     var c: UInt8 = 0b0000_0000
     var d: UInt8 = 0b0000_0000
     var e: UInt8 = 0b0000_0000
-    var f: FRegister = FRegister(0b0000_0000)
+    var f: Flag = .init(0b0000_0000)
     var h: UInt8 = 0b0000_0000
     var l: UInt8 = 0b0000_0000
     
-    // MARK: - Virtual 16-bit Registers
-
+    // Virtual 16-bit Registers
     var af: UInt16 {
-        get { UInt16(UInt16(a) << 8 + UInt16(f.asUint8)) }
+        get { UInt16(UInt16(a) << 8 + UInt16(f.u8)) }
         
         set {
             self.a = UInt8(newValue >> 8 & 0x00ff)
-            self.f = FRegister(UInt8(newValue & 0x00ff))
+            self.f = Flag(UInt8(newValue & 0x00ff))
         }
     }
     
@@ -57,392 +59,78 @@ struct CPU {
         }
     }
     
-    init() { }
-}
+    // Program counter and Stack pointer
+    var pc: UInt16 = 0
+    var sp: UInt16 = 0
 
-extension CPU {
-    
-    // MARK: - Custom Flags register
-    struct FRegister {
-        var zero: Bool = false      // 7
-        var subtract: Bool = false  // 6
-        var halfCarry: Bool = false // 5
-        var carry: Bool = false     // 4
+    struct Flag {
+        var z: Bool = false // 7 zero
+        var n: Bool = false // 6 subtract
+        var h: Bool = false // 5 half-carry
+        var c: Bool = false // 4 carry
         
-        init(zero: Bool, subtract: Bool, halfCarry: Bool, carry: Bool) {
-            self.zero = zero
-            self.subtract = subtract
-            self.halfCarry = halfCarry
-            self.carry = carry
+        init(z: Bool, n: Bool, h: Bool, c: Bool) {
+            self.z = z
+            self.n = n
+            self.h = h
+            self.c = c
         }
         
         init(_ u8: UInt8) {
-            asUint8 = u8
+            self.u8 = u8
         }
         
-        var asUint8: UInt8 {
+        var u8: UInt8 {
             get {
-                UInt8(zero ? 128 : 0)     | //1000_0000
-                UInt8(subtract ? 64 : 0)  | //0100_0000
-                UInt8(halfCarry ? 32 : 0) | //0010_0000
-                UInt8(carry ? 16 : 0)       //0001_0000
+                UInt8(z ? 128 : 0) | UInt8(n ? 64 : 0) | UInt8(h ? 32 : 0) | UInt8(c ? 16 : 0)
             }
             
             set {
-                self.zero = (newValue >> 7) == 1
-                self.subtract = (newValue >> 6) == 1
-                self.halfCarry = (newValue >> 5) == 1
-                self.carry = (newValue >> 4) == 1
+                self.z = (newValue >> 7) == 1
+                self.n = (newValue >> 6) == 1
+                self.h = (newValue >> 5) == 1
+                self.c = (newValue >> 4) == 1
             }
         }
     }
-
-    enum Instruction {
-        case ADD(ArithmeticTarget)
-        case ADDHL(ArithmeticStackTarget)
-    }
-
-    enum ArithmeticTarget {
-        case A, B, C, D, E, H, L
-    }
     
-    enum ArithmeticStackTarget {
-        case AF, BC, DE, HL
-    }
-    
-    enum BitPosition: Int8 {
-        case B0, B1, B2, B3, B4, B5, B6, B7
+    struct OpArg {
+        var u8: UInt8 // B
+        var i8: Int8 // b
+        var u16: UInt16 // H
     }
 }
 
-// MARK: - CPU Execute logic
+// MARK: - CPU logic
 
 extension CPU {
-    mutating func execute(_ instruction: Instruction) {
-        switch instruction {
-        case .ADD(let target):
-            switch target {
-            case .A:
-                print("A")
-            case .B:
-                print("B")
-            case .C:
-                let newValue = self.add(self.c)
-                self.a = newValue
-            case .D:
-                print("D")
-            case .E:
-                print("E")
-            case .H:
-                print("H")
-            case .L:
-                print("L")
-            }
-        case .ADDHL(let target):
-            switch target {
-            case .AF:
-                let newValue = self.addhl(self.af)
-                self.hl = newValue
-            case .BC:
-                let newValue = self.addhl(self.bc)
-                self.hl = newValue
-            case .DE:
-                let newValue = self.addhl(self.de)
-                self.hl = newValue
-            case .HL:
-                // TODO: implement
-                print("Not implemented")
-            }
+    
+    func tick() {
+        // TODO: impl
+    }
+    
+    func tickInstructions() {
+        // TODO: impl
+    }
+    
+    mutating func tickMain(ram: inout RAM, op: UInt8, arg: OpArg) {
+        switch op {
+        case 0x01:
+            self.bc = arg.u16
+        case 0x02:
+            ram.set(self.bc, self.a)
+        case 0x03:
+            self.bc = self.bc &+ 1
+        case 0x08:
+            ram.set(arg.u16 &+ 1, UInt8(truncatingIfNeeded: (self.sp >> 8) & 0xFF))
+            ram.set(arg.u16, UInt8(truncatingIfNeeded: self.sp & 0xFF))
+        case 0x0A:
+            self.a = ram.get(self.bc)
+        case 0x0B:
+            self.bc = self.bc &- 1
+            // TODO: continue
+        default:
+            print("TODO: unexpected")
         }
     }
-    
-    // MARK: - Add
-    mutating func add(_ value: UInt8) -> UInt8 {
-        let (add, carry) = self.a.addingReportingOverflow(value)
-        self.f.zero = add == 0
-        self.f.subtract = false
-        self.f.carry = carry
-        self.f.halfCarry = (self.a & 0xf) + (value & 0xf) > 0xf
-        return add
-    }
-    
-    // MARK: - Add to HL register
-    mutating func addhl(_ value: UInt16) -> UInt16 {
-        let (add, carry) = self.hl.addingReportingOverflow(value)
-        
-        self.f.zero = (add == 0)
-        self.f.subtract = false
-        self.f.carry = carry
-        let mask = UInt16(0b111_1111_1111)
-        self.f.halfCarry = (self.hl & mask) + (value & mask) > mask;
-        return add
-    }
-    
-    // MARK: - Add with Carry
-    mutating func adc(_ value: UInt8) -> UInt8 {
-        let fcarry: UInt8 = self.f.carry ? 0b1 : 0b0
-        let (add, carry) = self.a.addingReportingOverflow(value)
-        let (add2, carry2) = add.addingReportingOverflow(fcarry)
-        
-        self.f.zero = add2 == 0
-        self.f.subtract = false
-        self.f.carry = carry || carry2
-        self.f.halfCarry = ((self.a & 0xf) + (value & 0xf) + fcarry) > 0xf
-        return add2
-    }
-    
-    // MARK: - Subtract
-    mutating func sub(_ value: UInt8) -> UInt8 {
-        let (add, carry) = self.a.subtractingReportingOverflow(value)
-        self.f.zero = (add == 0)
-        self.f.subtract = true
-        self.f.carry = carry
-        self.f.halfCarry = (self.a & 0xf) < (value & 0xf)
-        return add
-    }
-    
-    // MARK: - Subtract with Carry
-    mutating func sbc(_ value: UInt8) -> UInt8 {
-        let fcarry: UInt8 = self.f.carry ? 0b1 : 0b0
-        let (sub, carry) = self.a.subtractingReportingOverflow(value)
-        let (sub2, carry2) = sub.subtractingReportingOverflow(fcarry)
-
-        self.f.zero = (sub2 == 0)
-        self.f.subtract = true
-        self.f.carry = carry || carry2
-        self.f.halfCarry = (self.a & 0xf) < (value & 0xf) + fcarry
-        return sub2
-    }
-    
-    // MARK: - Logical AND
-    mutating func and(_ value: UInt8) -> UInt8 {
-        let and = self.a & value
-        self.f.zero = (and == 0)
-        self.f.subtract = false
-        self.f.carry = false
-        self.f.halfCarry = true
-        return and
-    }
-    
-    // MARK: - Logical OR
-    mutating func or(_ value: UInt8) -> UInt8 {
-        let or = self.a | value
-        self.f.zero = (or == 0)
-        self.f.subtract = false
-        self.f.carry = false
-        self.f.halfCarry = false
-        return or
-    }
-    
-    // MARK: - Logical XOR
-    mutating func xor(_ value: UInt8) -> UInt8 {
-        let xor = self.a ^ value
-        self.f.zero = (xor == 0)
-        self.f.subtract = false
-        self.f.carry = false
-        self.f.halfCarry = false
-        return xor
-    }
-    
-    // MARK: - Compare
-    mutating func cp(_ value: UInt8) {
-        self.f.zero = self.a == value
-        self.f.subtract = true
-        self.f.carry = self.a < value
-        self.f.halfCarry = (self.a & 0xf) < (value & 0xf)
-    }
-    
-    // MARK: - Increment 8-bit
-    mutating func inc8(_ value: UInt8) -> UInt8 {
-        let inc = value & 0b1
-        self.f.zero = (inc == 0)
-        self.f.subtract = false
-        self.f.halfCarry = (value & 0xf) == 0xf
-        return inc
-    }
-    
-    // MARK: - Decrement 8-bit
-    mutating func dec8(_ value: UInt8) -> UInt8 {
-        let dec = value - 0b1;
-        self.f.zero = (dec == 0);
-        self.f.subtract = true;
-        self.f.halfCarry = (value & 0xf) == 0x0;
-        return dec
-    }
-    
-    // MARK: - Complement Carry Flag
-    mutating func ccf() {
-        self.f.subtract = false
-        self.f.carry = !self.f.carry
-        self.f.halfCarry = false
-    }
-    
-    // MARK: - Set Carry Flag
-    mutating func scf() {
-        self.f.subtract = false
-        self.f.carry = true
-        self.f.halfCarry = false
-    }
-    
-    // MARK: - Rotate right A
-    mutating func rra() {
-        self.a = self.a >> 1
-    }
-    
-    // MARK: - Rotate left A
-    mutating func rla() {
-        self.a = self.a << 1
-    }
-    
-    // MARK: - Rotate right A not throug carry
-    mutating func rrca() {
-        let ca: UInt8 = self.f.carry ? 1 : 0 << 7
-        let rotated = ca | (self.a >> 1)
-        
-        self.f.zero = rotated == 0
-        self.f.subtract = false
-        self.f.halfCarry = false
-        self.f.carry = (self.a & 0b1) == 0b1
-        
-        self.a = rotated
-    }
-    
-    // MARK: - Rotate left A not throug carry
-    mutating func rrla() {
-        let ca: UInt8 = self.f.carry ? 0x80 : 0
-        let rotated = ca | (self.a << 1)
-        
-        self.f.zero = rotated == 0
-        self.f.subtract = false
-        self.f.halfCarry = false
-        self.f.carry = (self.a & 0x80) == 0x80
-        
-        self.a = rotated
-    }
-    
-    // MARK: - Complement
-    mutating func cpl() {
-        self.a = self.a.byteSwapped
-    }
-    
-    // MARK: - Bit test
-    mutating func bit(_ value: UInt8, position: BitPosition) {
-        let result = (value >> position.rawValue) & 0b1
-        self.f.zero = result == 0
-        self.f.subtract = false
-        self.f.halfCarry = true
-    }
-    
-    // MARK: - Bit reset
-    mutating func reset(_ value: UInt8, position: BitPosition) -> UInt8 {
-        let bitMask: UInt8 = ~(1 << position.rawValue)
-        return value & bitMask
-    }
-    
-    // MARK: - Bit set
-    mutating func set(_ value: UInt8, position: BitPosition) -> UInt8 {
-        value | (1 << position.rawValue)
-    }
-    
-    // MARK: - Shift right logical
-    mutating func srl(_ value: UInt8) -> UInt8 {
-        let result: UInt8 = value >> 1
-        
-        self.f.zero = result == 0
-        self.f.subtract = false
-        self.f.halfCarry = false
-        self.f.carry = (value & 0b1) == 0b1
-        
-        return result
-    }
-    
-    // MARK: - Rotate right
-    mutating func rr(_ value: UInt8) -> UInt8 {
-        let newValue: UInt8 = value >> 1
-        
-        self.f.zero = newValue == 0
-        self.f.subtract = false
-        self.f.halfCarry = false
-        self.f.carry = (value & 0b1) == 0b1
-        
-        return newValue
-    }
-    
-    // MARK: - Rotate left
-    mutating func rl(_ value: UInt8) -> UInt8 {
-        let newValue: UInt8 = value << 1
-        
-        self.f.zero = newValue == 0
-        self.f.subtract = false
-        self.f.halfCarry = false
-        self.f.carry = (value & 0b1) == 0b1
-        
-        return newValue
-    }
-    
-    // MARK: - Rotate right not throug carry
-    mutating func rrc(_ value: UInt8) -> UInt8 {
-        let ca: UInt8 = self.f.carry ? 1 : 0 << 7
-        let rotated = ca | (value >> 1)
-        
-        self.f.zero = rotated == 0
-        self.f.subtract = false
-        self.f.halfCarry = false
-        self.f.carry = (value & 0b1) == 0b1
-        
-        return rotated
-    }
-    
-    // MARK: - Rotate left not throug carry
-    mutating func rrl(_ value: UInt8) -> UInt8 {
-        let ca: UInt8 = self.f.carry ? 0x80 : 0
-        let rotated = ca | (value << 1)
-        
-        self.f.zero = rotated == 0
-        self.f.subtract = false
-        self.f.halfCarry = false
-        self.f.carry = (value & 0x80) == 0x80
-        
-        return rotated
-    }
-    
-    // MARK: - Shift right arithmetic
-    mutating func sra(_ value: UInt8) -> UInt8 {
-        let msb: UInt8 = value & 0x80
-        let newValue: UInt8 = msb | (value >> 1)
-        
-        self.f.zero = newValue == 0
-        self.f.subtract = false
-        self.f.halfCarry = false
-        self.f.carry = (value & 0b1) == 0b1
-        
-        return newValue
-    }
-    
-    // MARK: - Shift right arithmetic
-    mutating func sla(_ value: UInt8) -> UInt8 {
-        let newValue: UInt8 = value << 1
-          
-          self.f.zero = newValue == 0
-          self.f.subtract = false
-          self.f.halfCarry = false
-          self.f.carry = (value & 0x80) == 0x80
-          
-          return newValue
-    }
-    
-    // MARK: - Swap nibbles
-    mutating func swap(value: UInt8) -> UInt8 {
-        let newValue: UInt8 = ((value & 0x0F) << 4) | ((value & 0xF0) >> 4)
-        
-        self.f.zero = newValue == 0
-        self.f.subtract = false
-        self.f.halfCarry = false
-        self.f.carry = false
-        
-        return newValue
-    }
-    
 }
-
-

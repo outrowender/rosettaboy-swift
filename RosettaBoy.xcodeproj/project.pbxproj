@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A266E222A3920E900376C9B /* CPUOps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A266E212A3920E900376C9B /* CPUOps.swift */; };
+		2A266E242A3D0DEE00376C9B /* Gameboy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A266E232A3D0DEE00376C9B /* Gameboy.swift */; };
+		2A266E262A3D1A8100376C9B /* RAM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A266E252A3D1A8100376C9B /* RAM.swift */; };
 		2A832D6D29FC483E00894E95 /* RosettaBoyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A832D6C29FC483E00894E95 /* RosettaBoyApp.swift */; };
 		2A832D6F29FC483E00894E95 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A832D6E29FC483E00894E95 /* ContentView.swift */; };
 		2A832D7129FC483F00894E95 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2A832D7029FC483F00894E95 /* Assets.xcassets */; };
@@ -26,6 +29,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2A266E212A3920E900376C9B /* CPUOps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUOps.swift; sourceTree = "<group>"; };
+		2A266E232A3D0DEE00376C9B /* Gameboy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gameboy.swift; sourceTree = "<group>"; };
+		2A266E252A3D1A8100376C9B /* RAM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAM.swift; sourceTree = "<group>"; };
 		2A832D6929FC483E00894E95 /* RosettaBoy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RosettaBoy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A832D6C29FC483E00894E95 /* RosettaBoyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosettaBoyApp.swift; sourceTree = "<group>"; };
 		2A832D6E29FC483E00894E95 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -111,7 +117,10 @@
 		2A832D9729FC485200894E95 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				2A266E232A3D0DEE00376C9B /* Gameboy.swift */,
 				2A832D9829FC486900894E95 /* CPU.swift */,
+				2A266E212A3920E900376C9B /* CPUOps.swift */,
+				2A266E252A3D1A8100376C9B /* RAM.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -216,7 +225,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2A266E262A3D1A8100376C9B /* RAM.swift in Sources */,
+				2A266E242A3D0DEE00376C9B /* Gameboy.swift in Sources */,
 				2A832D6F29FC483E00894E95 /* ContentView.swift in Sources */,
+				2A266E222A3920E900376C9B /* CPUOps.swift in Sources */,
 				2A832D6D29FC483E00894E95 /* RosettaBoyApp.swift in Sources */,
 				2A832D9929FC486900894E95 /* CPU.swift in Sources */,
 			);
