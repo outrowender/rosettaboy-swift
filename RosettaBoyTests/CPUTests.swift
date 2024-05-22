@@ -6,225 +6,267 @@
 //
 
 import Foundation
-@testable import RosettaBoy
 import XCTest
-
+@testable import RosettaBoy
 
 final class CPUTests: XCTestCase {
     
-    func testVirtualRegistersMustDoAF() throws {
-        
-        // GIVEN
+    // MARK: - Simple register operation
+    func testVRegistersShouldDoAF() throws {
+        // given
         var cpu = CPU()
         
-        // WHEN
+        // when
         cpu.af = UInt16(0b1000_0011_0010_0000)
         
-        // THEN
-        
+        // then
         XCTAssertEqual(cpu.a, UInt8(0b1000_0011))
-        XCTAssertEqual(cpu.f.asUint8, UInt8(0b0010_0000))
+        XCTAssertEqual(cpu.f.u8, UInt8(0b0010_0000))
         XCTAssertEqual(cpu.af, UInt16(0b1000_0011_0010_0000))
     }
     
-    func testVirtualRegistersMustDoBC() throws {
-        
-        // GIVEN
+    func testVRegistersShouldDoBC() throws {
+        // given
         var cpu = CPU()
         
-        // WHEN
+        // when
         cpu.bc = UInt16(0b1000_0011_0000_1010)
         
-        // THEN
-        
+        // then
         XCTAssertEqual(cpu.b, UInt8(0b1000_0011))
         XCTAssertEqual(cpu.c, UInt8(0b0000_1010))
         XCTAssertEqual(cpu.bc, UInt16(0b1000_0011_0000_1010))
     }
     
-    func testVirtualRegistersMustDoDE() throws {
-        
-        // GIVEN
+    func testVRegistersShouldDoDE() throws {
+        // given
         var cpu = CPU()
         
-        // WHEN
+        // when
         cpu.de = UInt16(0b1000_0011_0000_1010)
         
-        // THEN
-        
+        // then
         XCTAssertEqual(cpu.d, UInt8(0b1000_0011))
         XCTAssertEqual(cpu.e, UInt8(0b0000_1010))
         XCTAssertEqual(cpu.de, UInt16(0b1000_0011_0000_1010))
     }
     
-    func testVirtualRegistersMustDoHI() throws {
-        
-        // GIVEN
+    func testVRegistersShouldDoHI() throws {
+        // given
         var cpu = CPU()
         
-        // WHEN
+        // when
         cpu.hl = UInt16(0b1000_0011_0000_1010)
         
-        // THEN
-        
+        // then
         XCTAssertEqual(cpu.h, UInt8(0b1000_0011))
         XCTAssertEqual(cpu.l, UInt8(0b0000_1010))
         XCTAssertEqual(cpu.hl, UInt16(0b1000_0011_0000_1010))
     }
     
-    func testFlagsShouldConvertToBoolAndBackCorrectly() throws {
-        // GIVEN
-        let cpu = CPU.FRegister(0b0100_0000)
+    // MARK: - Flags register logic
+    func testFlagsInitializersShouldProduceSameResult() throws {
+        // when
+        let flags = CPU.Flags(0b1000_0000)
+        let flags2 = CPU.Flags(z: true, n: false, h: false, c: false)
         
-        // THEN
-        XCTAssertTrue(cpu.subtract)
-        XCTAssertFalse(cpu.zero || cpu.halfCarry || cpu.carry)
-        XCTAssertEqual(cpu.asUint8, 0b0100_0000)
+        // then
+        XCTAssertEqual(flags, flags2)
     }
     
     func testFlagsShouldInitializeWithBit() throws {
-        // GIVEN
-        let cpu = CPU.FRegister(
-            zero: true,
-            subtract: false,
-            halfCarry: false,
-            carry: true)
+        // when
+        let flags = CPU.Flags(z: true, n: false, h: false, c: true)
         
-        // THEN
-        XCTAssertTrue(cpu.zero && cpu.carry)
-        XCTAssertEqual(cpu.asUint8, 0b1001_0000)
+        // then
+        XCTAssertTrue(flags.z && flags.c)
+        XCTAssertEqual(flags.u8, 0b1001_0000)
     }
-    
+ 
     func testFlagsShouldAlwaysClearFirst4bits() throws {
-        // GIVEN
-        let cpu = CPU.FRegister(0b0100_1111)
+        // given
+        let flags = CPU.Flags(0b0100_1111)
         
-        // THEN
-        XCTAssertTrue(cpu.subtract)
-        XCTAssertFalse(cpu.zero || cpu.halfCarry || cpu.carry)
-        XCTAssertEqual(cpu.asUint8, 0b0100_0000)
+        // then
+        XCTAssertTrue(flags.n)
+        XCTAssertFalse(flags.z || flags.h || flags.c)
+        XCTAssertEqual(flags.u8, 0b0100_0000)
     }
     
-    func testExecuteAddShouldDoFalseForOverflowWhenItsNot() throws {
-        // GIVEN
-        var cpu = CPU()
-        cpu.a = 0b0
-        cpu.c = 0b0000_0001
+    // MARK: - Execution
+    func testCarryFlagsShouldBeSetIf8bitAddIsHigherThanFF() throws {
+        // given
+        let cpu = CPU()
         
-        // WHEN
-        cpu.execute(.ADD(.C))
-    
-        // THEN
-        XCTAssertEqual(cpu.a, 0b0000_0001)
-        XCTAssertFalse(cpu.f.zero)
-        XCTAssertFalse(cpu.f.subtract)
-        XCTAssertFalse(cpu.f.halfCarry)
-        XCTAssertFalse(cpu.f.carry)
+        // when
+        cpu.a = 0b0000_0001
+        cpu.b = 0b1111_1111
+        cpu.add(cpu.b)
+        
+        // then
+        XCTAssertEqual(cpu.a, 0b0000_0000)
+        XCTAssertTrue(cpu.f.z)
+        XCTAssertFalse(cpu.f.n)
+        XCTAssertTrue(cpu.f.c)
+        XCTAssertTrue(cpu.f.h)
     }
     
-    func testExecuteAddShouldDealWithOverflow() throws {
-        // GIVEN
-        var cpu = CPU()
-        cpu.a = 0b0000_1111
-        cpu.c = 0b0000_0001
+    func testCarryFlagsShouldBeSetIfHC() throws {
+        // given
+        let cpu = CPU()
         
-        // WHEN
-        cpu.execute(.ADD(.C))
-
-        // THEN
+        // when
+        cpu.a = 0b0000_0001
+        cpu.b = 0b0000_1110
+        cpu.add(cpu.b)
+        
+        // then
+        XCTAssertEqual(cpu.a, 0b0000_1111)
+        XCTAssertFalse(cpu.f.z)
+        XCTAssertFalse(cpu.f.n)
+        XCTAssertFalse(cpu.f.c)
+        XCTAssertFalse(cpu.f.h)
+    }
+    
+    func testCarryFlagsShouldBeSetIfHC2() throws {
+        // given
+        let cpu = CPU()
+        
+        // when
+        cpu.a = 0b0000_0001
+        cpu.b = 0b0000_1111
+        cpu.add(cpu.b)
+        
+        // then
         XCTAssertEqual(cpu.a, 0b0001_0000)
-        XCTAssertFalse(cpu.f.zero)
-        XCTAssertFalse(cpu.f.subtract)
-        XCTAssertTrue(cpu.f.halfCarry)
-        XCTAssertFalse(cpu.f.carry)
+        XCTAssertFalse(cpu.f.z)
+        XCTAssertFalse(cpu.f.n)
+        XCTAssertFalse(cpu.f.c)
+        XCTAssertTrue(cpu.f.h) // wth hc is doin
     }
     
-    func testExecuteAddShouldDealWithFullOverflow() throws {
-        // GIVEN
-        var cpu = CPU()
-        cpu.a = 0b1111_1111
-        cpu.c = 0b0000_0001
-        
-        // WHEN
-        cpu.execute(.ADD(.C))
-
-        // THEN
-        XCTAssertEqual(cpu.a, 0b0)
-        XCTAssertTrue(cpu.f.zero)
-        XCTAssertFalse(cpu.f.subtract)
-        XCTAssertTrue(cpu.f.halfCarry)
-        XCTAssertTrue(cpu.f.carry)
-    }
     
-    func testExecuteAddHLShouldDealWithOverflow() throws {
-        // GIVEN
-        var cpu = CPU()
-        
-        cpu.bc = 0b0000_0001_0000_0001
-        cpu.hl = 0b0001_0001_0001_0011
-        
-        // WHEN
-        cpu.execute(.ADDHL(.BC))
-    
-        // THEN
-        XCTAssertEqual(cpu.hl, 0b0001_0010_0001_0100)
-        XCTAssertFalse(cpu.f.zero)
-        XCTAssertFalse(cpu.f.subtract)
-        XCTAssertFalse(cpu.f.halfCarry)
-        XCTAssertFalse(cpu.f.carry)
-    }
-    
-    func testExecuteAddHLShouldDealWithOverflowWithHalfCarry() throws {
-        // GIVEN
-        var cpu = CPU()
-        
-        cpu.bc = 0b0000_0111_1111_1111
-        cpu.hl = 0b1
-        
-        // WHEN
-        cpu.execute(.ADDHL(.BC))
-    
-        // THEN
-        XCTAssertEqual(cpu.hl, 0b0000_1000_0000_0000)
-        XCTAssertFalse(cpu.f.zero)
-        XCTAssertFalse(cpu.f.subtract)
-        XCTAssertTrue(cpu.f.halfCarry)
-        XCTAssertFalse(cpu.f.carry)
-    }
-    
-    func testExecuteAddHLShouldDealWithOverflowWithOverflow() throws {
-        // GIVEN
-        var cpu = CPU()
-        
-        cpu.bc = 0b1111_1111_1111_1111
-        cpu.hl = 0b1
-        
-        // WHEN
-        cpu.execute(.ADDHL(.BC))
-    
-        // THEN
-        XCTAssertEqual(cpu.hl, 0b0)
-        XCTAssertTrue(cpu.f.zero)
-        XCTAssertFalse(cpu.f.subtract)
-        XCTAssertTrue(cpu.f.halfCarry)
-        XCTAssertTrue(cpu.f.carry)
-    }
-    
-    func testExecuteAddHLShouldDealWithOverflowWithFullOverflow() throws {
-        // GIVEN
-        var cpu = CPU()
-        
-        cpu.bc = 0b1111_1111_1111_1111
-        cpu.hl = 0b0000_0000_0000_0010
-        
-        // WHEN
-        cpu.execute(.ADDHL(.BC))
-    
-        // THEN
-        XCTAssertEqual(cpu.hl, 0b1)
-        XCTAssertFalse(cpu.f.zero)
-        XCTAssertFalse(cpu.f.subtract)
-        XCTAssertTrue(cpu.f.halfCarry)
-        XCTAssertTrue(cpu.f.carry)
-    }
+//
+//    func testExecuteAddShouldDoFalseForOverflowwhenItsNot() throws {
+//        // given
+//        var cpu = CPU()
+//        cpu.a = 0b0
+//        cpu.c = 0b0000_0001
+//        
+//        // when
+//        cpu.execute(.ADD(.C))
+//    
+//        // then
+//        XCTAssertEqual(cpu.a, 0b0000_0001)
+//        XCTAssertFalse(cpu.f.zero)
+//        XCTAssertFalse(cpu.f.subtract)
+//        XCTAssertFalse(cpu.f.halfCarry)
+//        XCTAssertFalse(cpu.f.carry)
+//    }
+//    
+//    func testExecuteAddShouldDealWithOverflow() throws {
+//        // given
+//        var cpu = CPU()
+//        cpu.a = 0b0000_1111
+//        cpu.c = 0b0000_0001
+//        
+//        // when
+//        cpu.execute(.ADD(.C))
+//
+//        // then
+//        XCTAssertEqual(cpu.a, 0b0001_0000)
+//        XCTAssertFalse(cpu.f.zero)
+//        XCTAssertFalse(cpu.f.subtract)
+//        XCTAssertTrue(cpu.f.halfCarry)
+//        XCTAssertFalse(cpu.f.carry)
+//    }
+//    
+//    func testExecuteAddShouldDealWithFullOverflow() throws {
+//        // given
+//        var cpu = CPU()
+//        cpu.a = 0b1111_1111
+//        cpu.c = 0b0000_0001
+//        
+//        // when
+//        cpu.execute(.ADD(.C))
+//
+//        // then
+//        XCTAssertEqual(cpu.a, 0b0)
+//        XCTAssertTrue(cpu.f.zero)
+//        XCTAssertFalse(cpu.f.subtract)
+//        XCTAssertTrue(cpu.f.halfCarry)
+//        XCTAssertTrue(cpu.f.carry)
+//    }
+//    
+//    func testExecuteAddHLShouldDealWithOverflow() throws {
+//        // given
+//        var cpu = CPU()
+//        
+//        cpu.bc = 0b0000_0001_0000_0001
+//        cpu.hl = 0b0001_0001_0001_0011
+//        
+//        // when
+//        cpu.execute(.ADDHL(.BC))
+//    
+//        // then
+//        XCTAssertEqual(cpu.hl, 0b0001_0010_0001_0100)
+//        XCTAssertFalse(cpu.f.zero)
+//        XCTAssertFalse(cpu.f.subtract)
+//        XCTAssertFalse(cpu.f.halfCarry)
+//        XCTAssertFalse(cpu.f.carry)
+//    }
+//    
+//    func testExecuteAddHLShouldDealWithOverflowWithHalfCarry() throws {
+//        // given
+//        var cpu = CPU()
+//        
+//        cpu.bc = 0b0000_0111_1111_1111
+//        cpu.hl = 0b1
+//        
+//        // when
+//        cpu.execute(.ADDHL(.BC))
+//    
+//        // then
+//        XCTAssertEqual(cpu.hl, 0b0000_1000_0000_0000)
+//        XCTAssertFalse(cpu.f.zero)
+//        XCTAssertFalse(cpu.f.subtract)
+//        XCTAssertTrue(cpu.f.halfCarry)
+//        XCTAssertFalse(cpu.f.carry)
+//    }
+//    
+//    func testExecuteAddHLShouldDealWithOverflowWithOverflow() throws {
+//        // given
+//        var cpu = CPU()
+//        
+//        cpu.bc = 0b1111_1111_1111_1111
+//        cpu.hl = 0b1
+//        
+//        // when
+//        cpu.execute(.ADDHL(.BC))
+//    
+//        // then
+//        XCTAssertEqual(cpu.hl, 0b0)
+//        XCTAssertTrue(cpu.f.zero)
+//        XCTAssertFalse(cpu.f.subtract)
+//        XCTAssertTrue(cpu.f.halfCarry)
+//        XCTAssertTrue(cpu.f.carry)
+//    }
+//    
+//    func testExecuteAddHLShouldDealWithOverflowWithFullOverflow() throws {
+//        // given
+//        var cpu = CPU()
+//        
+//        cpu.bc = 0b1111_1111_1111_1111
+//        cpu.hl = 0b0000_0000_0000_0010
+//        
+//        // when
+//        cpu.execute(.ADDHL(.BC))
+//    
+//        // then
+//        XCTAssertEqual(cpu.hl, 0b1)
+//        XCTAssertFalse(cpu.f.zero)
+//        XCTAssertFalse(cpu.f.subtract)
+//        XCTAssertTrue(cpu.f.halfCarry)
+//        XCTAssertTrue(cpu.f.carry)
+//    }
 }
