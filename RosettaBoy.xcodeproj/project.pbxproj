@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2A266E222A3920E900376C9B /* CPUOps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A266E212A3920E900376C9B /* CPUOps.swift */; };
+		2A266E222A3920E900376C9B /* CPUInstructions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A266E212A3920E900376C9B /* CPUInstructions.swift */; };
 		2A266E242A3D0DEE00376C9B /* Gameboy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A266E232A3D0DEE00376C9B /* Gameboy.swift */; };
 		2A266E262A3D1A8100376C9B /* RAM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A266E252A3D1A8100376C9B /* RAM.swift */; };
+		2A441D1A2BFD9C96006EB635 /* UInt8.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A441D192BFD9C96006EB635 /* UInt8.swift */; };
 		2A832D6D29FC483E00894E95 /* RosettaBoyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A832D6C29FC483E00894E95 /* RosettaBoyApp.swift */; };
 		2A832D6F29FC483E00894E95 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A832D6E29FC483E00894E95 /* ContentView.swift */; };
 		2A832D7129FC483F00894E95 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2A832D7029FC483F00894E95 /* Assets.xcassets */; };
@@ -29,9 +30,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2A266E212A3920E900376C9B /* CPUOps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUOps.swift; sourceTree = "<group>"; };
+		2A266E212A3920E900376C9B /* CPUInstructions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUInstructions.swift; sourceTree = "<group>"; };
 		2A266E232A3D0DEE00376C9B /* Gameboy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gameboy.swift; sourceTree = "<group>"; };
 		2A266E252A3D1A8100376C9B /* RAM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAM.swift; sourceTree = "<group>"; };
+		2A441D192BFD9C96006EB635 /* UInt8.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UInt8.swift; sourceTree = "<group>"; };
 		2A832D6929FC483E00894E95 /* RosettaBoy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RosettaBoy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A832D6C29FC483E00894E95 /* RosettaBoyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosettaBoyApp.swift; sourceTree = "<group>"; };
 		2A832D6E29FC483E00894E95 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -64,6 +66,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2A441D132BFD9B80006EB635 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				2A441D192BFD9C96006EB635 /* UInt8.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		2A832D6029FC483E00894E95 = {
 			isa = PBXGroup;
 			children = (
@@ -117,9 +127,10 @@
 		2A832D9729FC485200894E95 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				2A441D132BFD9B80006EB635 /* Extensions */,
 				2A266E232A3D0DEE00376C9B /* Gameboy.swift */,
 				2A832D9829FC486900894E95 /* CPU.swift */,
-				2A266E212A3920E900376C9B /* CPUOps.swift */,
+				2A266E212A3920E900376C9B /* CPUInstructions.swift */,
 				2A266E252A3D1A8100376C9B /* RAM.swift */,
 			);
 			path = Source;
@@ -171,7 +182,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1540;
 				TargetAttributes = {
 					2A832D6829FC483E00894E95 = {
 						CreatedOnToolsVersion = 14.3;
@@ -227,8 +238,9 @@
 			files = (
 				2A266E262A3D1A8100376C9B /* RAM.swift in Sources */,
 				2A266E242A3D0DEE00376C9B /* Gameboy.swift in Sources */,
+				2A441D1A2BFD9C96006EB635 /* UInt8.swift in Sources */,
 				2A832D6F29FC483E00894E95 /* ContentView.swift in Sources */,
-				2A266E222A3920E900376C9B /* CPUOps.swift in Sources */,
+				2A266E222A3920E900376C9B /* CPUInstructions.swift in Sources */,
 				2A832D6D29FC483E00894E95 /* RosettaBoyApp.swift in Sources */,
 				2A832D9929FC486900894E95 /* CPU.swift in Sources */,
 			);
@@ -286,9 +298,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -344,9 +358,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -370,6 +386,7 @@
 				CODE_SIGN_ENTITLEMENTS = RosettaBoy/RosettaBoy.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"RosettaBoy/Preview Content\"";
 				DEVELOPMENT_TEAM = GLB476Z655;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -408,6 +425,7 @@
 				CODE_SIGN_ENTITLEMENTS = RosettaBoy/RosettaBoy.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"RosettaBoy/Preview Content\"";
 				DEVELOPMENT_TEAM = GLB476Z655;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -445,6 +463,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = GLB476Z655;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
@@ -468,6 +487,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = GLB476Z655;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
