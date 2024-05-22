@@ -1,9 +1,9 @@
 //
-//  CPUOps.swift
+//  CPUInstructions.swift
 //  RosettaBoy
 //
 //  Created by Wender on 13/06/23.
-//
+//  Based on https://gbdev.io/pandocs/CPU_Instruction_Set.html
 
 import Foundation
 
@@ -101,17 +101,18 @@ extension CPU {
 
 extension CPU {
     // MARK: - Add
-    mutating func add(_ value: UInt8) -> UInt8 {
-        let (add, carry) = self.a.addingReportingOverflow(value)
+    func add(_ value: UInt8) {
+        let (add, carry) = self.a.addingReportingOverflow(value) // understand carry per bit - reporting overflow
         self.f.z = add == 0
         self.f.n = false
         self.f.c = carry
-        self.f.h = (self.a & 0xf) + (value & 0xf) > 0xf
-        return add
+        self.f.h = (self.a & 0xf) + (value & 0xf) + UInt8(carry) > 0xf
+        
+        self.a = add
     }
     
     // MARK: - Add to HL register
-    mutating func addhl(_ value: UInt16) -> UInt16 {
+    func addhl(_ value: UInt16) -> UInt16 {
         let (add, carry) = self.hl.addingReportingOverflow(value)
         
         self.f.z = (add == 0)
@@ -123,7 +124,7 @@ extension CPU {
     }
     
     // MARK: - Add with Carry
-    mutating func adc(_ value: UInt8) -> UInt8 {
+    func adc(_ value: UInt8) -> UInt8 {
         let fcarry: UInt8 = self.f.c ? 0b1 : 0b0
         let (add, carry) = self.a.addingReportingOverflow(value)
         let (add2, carry2) = add.addingReportingOverflow(fcarry)
@@ -136,7 +137,7 @@ extension CPU {
     }
     
     // MARK: - Subtract
-    mutating func sub(_ value: UInt8) -> UInt8 {
+    func sub(_ value: UInt8) -> UInt8 {
         let (add, carry) = self.a.subtractingReportingOverflow(value)
         self.f.z = (add == 0)
         self.f.n = true
@@ -146,7 +147,7 @@ extension CPU {
     }
     
     // MARK: - Subtract with Carry
-    mutating func sbc(_ value: UInt8) -> UInt8 {
+    func sbc(_ value: UInt8) -> UInt8 {
         let fcarry: UInt8 = self.f.c ? 0b1 : 0b0
         let (sub, carry) = self.a.subtractingReportingOverflow(value)
         let (sub2, carry2) = sub.subtractingReportingOverflow(fcarry)
@@ -159,7 +160,7 @@ extension CPU {
     }
     
     // MARK: - Logical AND
-    mutating func and(_ value: UInt8) -> UInt8 {
+    func and(_ value: UInt8) -> UInt8 {
         let and = self.a & value
         self.f.z = (and == 0)
         self.f.n = false
@@ -169,7 +170,7 @@ extension CPU {
     }
     
     // MARK: - Logical OR
-    mutating func or(_ value: UInt8) -> UInt8 {
+    func or(_ value: UInt8) -> UInt8 {
         let or = self.a | value
         self.f.z = (or == 0)
         self.f.n = false
@@ -179,7 +180,7 @@ extension CPU {
     }
     
     // MARK: - Logical XOR
-    mutating func xor(_ value: UInt8) -> UInt8 {
+    func xor(_ value: UInt8) -> UInt8 {
         let xor = self.a ^ value
         self.f.z = (xor == 0)
         self.f.n = false
@@ -189,7 +190,7 @@ extension CPU {
     }
     
     // MARK: - Compare
-    mutating func cp(_ value: UInt8) {
+    func cp(_ value: UInt8) {
         self.f.z = self.a == value
         self.f.n = true
         self.f.c = self.a < value
@@ -197,7 +198,7 @@ extension CPU {
     }
     
     // MARK: - Increment 8-bit
-    mutating func inc8(_ value: UInt8) -> UInt8 {
+    func inc8(_ value: UInt8) -> UInt8 {
         let inc = value & 0b1
         self.f.z = (inc == 0)
         self.f.n = false
@@ -206,7 +207,7 @@ extension CPU {
     }
     
     // MARK: - Decrement 8-bit
-    mutating func dec8(_ value: UInt8) -> UInt8 {
+    func dec8(_ value: UInt8) -> UInt8 {
         let dec = value - 0b1
         self.f.z = (dec == 0)
         self.f.n = true
@@ -215,31 +216,31 @@ extension CPU {
     }
     
     // MARK: - Complement Carry Flag
-    mutating func ccf() {
+    func ccf() {
         self.f.n = false
         self.f.c = !self.f.c
         self.f.h = false
     }
     
     // MARK: - Set Carry Flag
-    mutating func scf() {
+    func scf() {
         self.f.n = false
         self.f.c = true
         self.f.h = false
     }
     
     // MARK: - Rotate right A
-    mutating func rra() {
+    func rra() {
         self.a = self.a >> 1
     }
     
     // MARK: - Rotate left A
-    mutating func rla() {
+    func rla() {
         self.a = self.a << 1
     }
     
     // MARK: - Rotate right A not throug carry
-    mutating func rrca() {
+    func rrca() {
         let ca: UInt8 = self.f.c ? 1 : 0 << 7
         let rotated = ca | (self.a >> 1)
         
@@ -252,7 +253,7 @@ extension CPU {
     }
     
     // MARK: - Rotate left A not throug carry
-    mutating func rrla() {
+    func rrla() {
         let ca: UInt8 = self.f.c ? 0x80 : 0
         let rotated = ca | (self.a << 1)
         
@@ -265,12 +266,12 @@ extension CPU {
     }
     
     // MARK: - Complement
-    mutating func cpl() {
+    func cpl() {
         self.a = self.a.byteSwapped
     }
     
     // MARK: - Bit test
-    mutating func bit(_ value: UInt8, position: BitPosition) {
+    func bit(_ value: UInt8, position: BitPosition) {
         let result = (value >> position.rawValue) & 0b1
         self.f.z = result == 0
         self.f.n = false
@@ -278,18 +279,18 @@ extension CPU {
     }
     
     // MARK: - Bit reset
-    mutating func reset(_ value: UInt8, position: BitPosition) -> UInt8 {
+    func reset(_ value: UInt8, position: BitPosition) -> UInt8 {
         let bitMask: UInt8 = ~(1 << position.rawValue)
         return value & bitMask
     }
     
     // MARK: - Bit set
-    mutating func set(_ value: UInt8, position: BitPosition) -> UInt8 {
+    func set(_ value: UInt8, position: BitPosition) -> UInt8 {
         value | (1 << position.rawValue)
     }
     
     // MARK: - Shift right logical
-    mutating func srl(_ value: UInt8) -> UInt8 {
+    func srl(_ value: UInt8) -> UInt8 {
         let result: UInt8 = value >> 1
         
         self.f.z = result == 0
@@ -301,7 +302,7 @@ extension CPU {
     }
     
     // MARK: - Rotate right
-    mutating func rr(_ value: UInt8) -> UInt8 {
+    func rr(_ value: UInt8) -> UInt8 {
         let newValue: UInt8 = value >> 1
         
         self.f.z = newValue == 0
@@ -313,7 +314,7 @@ extension CPU {
     }
     
     // MARK: - Rotate left
-    mutating func rl(_ value: UInt8) -> UInt8 {
+    func rl(_ value: UInt8) -> UInt8 {
         let newValue: UInt8 = value << 1
         
         self.f.z = newValue == 0
@@ -325,7 +326,7 @@ extension CPU {
     }
     
     // MARK: - Rotate right not throug carry
-    mutating func rrc(_ value: UInt8) -> UInt8 {
+    func rrc(_ value: UInt8) -> UInt8 {
         let ca: UInt8 = self.f.c ? 1 : 0 << 7
         let rotated = ca | (value >> 1)
         
@@ -338,7 +339,7 @@ extension CPU {
     }
     
     // MARK: - Rotate left not throug carry
-    mutating func rrl(_ value: UInt8) -> UInt8 {
+    func rrl(_ value: UInt8) -> UInt8 {
         let ca: UInt8 = self.f.c ? 0x80 : 0
         let rotated = ca | (value << 1)
         
@@ -351,7 +352,7 @@ extension CPU {
     }
     
     // MARK: - Shift right arithmetic
-    mutating func sra(_ value: UInt8) -> UInt8 {
+    func sra(_ value: UInt8) -> UInt8 {
         let msb: UInt8 = value & 0x80
         let newValue: UInt8 = msb | (value >> 1)
         
@@ -364,7 +365,7 @@ extension CPU {
     }
     
     // MARK: - Shift right arithmetic
-    mutating func sla(_ value: UInt8) -> UInt8 {
+    func sla(_ value: UInt8) -> UInt8 {
         let newValue: UInt8 = value << 1
         
         self.f.z = newValue == 0
@@ -376,7 +377,7 @@ extension CPU {
     }
     
     // MARK: - Swap nibbles
-    mutating func swap(value: UInt8) -> UInt8 {
+    func swap(value: UInt8) -> UInt8 {
         let newValue: UInt8 = ((value & 0x0F) << 4) | ((value & 0xF0) >> 4)
         
         self.f.z = newValue == 0

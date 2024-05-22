@@ -3,12 +3,12 @@
 //  RosettaBoy
 //
 //  Created by Wender on 28/04/23.
-//
+//  Based on https://gbdev.io/pandocs/CPU_Registers_and_Flags.html
 
 import Foundation
 
 // MARK: - CPU bit Architecture
-struct CPU {
+class CPU {
     
     init() { }
     
@@ -18,7 +18,7 @@ struct CPU {
     var c: UInt8 = 0b0000_0000
     var d: UInt8 = 0b0000_0000
     var e: UInt8 = 0b0000_0000
-    var f: Flag = .init(0b0000_0000)
+    var f: Flags = .init(0b0000_0000)
     var h: UInt8 = 0b0000_0000
     var l: UInt8 = 0b0000_0000
     
@@ -28,7 +28,7 @@ struct CPU {
         
         set {
             self.a = UInt8(newValue >> 8 & 0x00ff)
-            self.f = Flag(UInt8(newValue & 0x00ff))
+            self.f = .init(UInt8(newValue & 0x00ff))
         }
     }
     
@@ -63,7 +63,7 @@ struct CPU {
     var pc: UInt16 = 0
     var sp: UInt16 = 0
 
-    struct Flag {
+    struct Flags: Equatable {
         var z: Bool = false // 7 zero
         var n: Bool = false // 6 subtract
         var h: Bool = false // 5 half-carry
@@ -113,7 +113,7 @@ extension CPU {
         // TODO: impl
     }
     
-    mutating func tickMain(ram: inout RAM, op: UInt8, arg: OpArg) {
+    func tickMain(ram: inout RAM, op: UInt8, arg: OpArg) {
         switch op {
         case 0x01:
             self.bc = arg.u16
