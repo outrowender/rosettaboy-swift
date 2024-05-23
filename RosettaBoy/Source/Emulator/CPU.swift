@@ -4,6 +4,8 @@
 //
 //  Created by Wender on 28/04/23.
 //  Based on https://gbdev.io/pandocs/CPU_Registers_and_Flags.html
+//  More https://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html
+//  https://archive.org/details/GameBoyProgManVer1.1/page/n85/mode/2up
 
 import Foundation
 
@@ -104,6 +106,21 @@ class CPU {
 // MARK: - CPU logic
 
 extension CPU {
+    
+    func execute(_ instruction: CPU.Instruction) {
+        
+        let instructionMap: [CPU.Instruction: () -> ()] = [
+            .ADD(.B): { self.add(self.b) },
+            .ADD(.C): { self.add(self.c) },
+            .ADD(.D): { self.add(self.d) }
+        ]
+        
+        guard let executable = instructionMap[instruction] else {
+            fatalError("\(instruction) not implemented")
+        }
+
+        executable()
+    }
     
     func tick() {
         // TODO: impl

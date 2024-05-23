@@ -66,19 +66,19 @@ extension CPU {
         case EI
     }
 
-    enum ArithmeticTarget {
+    enum ArithmeticTarget: Hashable {
         case A, B, C, D, E, H, L, D8, HLI
     }
     
-    enum IncDecTarget {
+    enum IncDecTarget: Hashable {
         case A, B, C, D, E, H, L, HLI, BC, DE, HL, SP
     }
     
-    enum ADDHLTarget {
+    enum ADDHLTarget: Hashable {
         case BC, DE, HL, SP
     }
     
-    enum StackTarget {
+    enum StackTarget: Hashable {
         case AF, BC, DE, HL
     }
     
@@ -86,15 +86,15 @@ extension CPU {
         case B0, B1, B2, B3, B4, B5, B6, B7
     }
     
-    enum PrefixTarget {
+    enum PrefixTarget: Hashable {
         case A, B, C, D, E, H, L, HLI
     }
     
-    enum JumpTestTarget {
+    enum JumpTestTarget: Hashable {
         case NotZero, NotCarry, Zero, Carry, Always
     }
     
-    enum RSTLocation {
+    enum RSTLocation: Hashable {
         case X00, X08, X10, X18, X20, X28, X30, X38
     }
 }
@@ -126,7 +126,7 @@ extension CPU {
     
     // MARK: - Add with Carry
     func adc(_ value: UInt8) -> UInt8 {
-        let fcarry: UInt8 = self.f.c ? 0b1 : 0b0
+        let fcarry = UInt8(self.f.c)
         let (add, carry) = self.a.addingReportingOverflow(value)
         let (add2, carry2) = add.addingReportingOverflow(fcarry)
         
