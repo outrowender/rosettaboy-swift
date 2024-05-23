@@ -5,7 +5,6 @@
 //  Created by Wender on 28/04/23.
 //
 
-import Foundation
 import XCTest
 @testable import RosettaBoy
 
@@ -14,7 +13,7 @@ final class CPUTests: XCTestCase {
     // MARK: - Simple register operation
     func testVRegistersShouldDoAF() throws {
         // given
-        var cpu = CPU()
+        let cpu = CPU()
         
         // when
         cpu.af = UInt16(0b1000_0011_0010_0000)
@@ -27,7 +26,7 @@ final class CPUTests: XCTestCase {
     
     func testVRegistersShouldDoBC() throws {
         // given
-        var cpu = CPU()
+        let cpu = CPU()
         
         // when
         cpu.bc = UInt16(0b1000_0011_0000_1010)
@@ -40,7 +39,7 @@ final class CPUTests: XCTestCase {
     
     func testVRegistersShouldDoDE() throws {
         // given
-        var cpu = CPU()
+        let cpu = CPU()
         
         // when
         cpu.de = UInt16(0b1000_0011_0000_1010)
@@ -53,7 +52,7 @@ final class CPUTests: XCTestCase {
     
     func testVRegistersShouldDoHI() throws {
         // given
-        var cpu = CPU()
+        let cpu = CPU()
         
         // when
         cpu.hl = UInt16(0b1000_0011_0000_1010)
@@ -111,41 +110,60 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(cpu.f.h)
     }
     
-    func testCarryFlagsShouldBeSetIfHC() throws {
+    func testHalfCarryFlagShouldBeSetIfHalfCarry() throws {
         // given
         let cpu = CPU()
         
         // when
-        cpu.a = 0b0000_0001
-        cpu.b = 0b0000_1110
+        cpu.a = 0b1000_1111
+        cpu.b = 0b0000_0001
         cpu.add(cpu.b)
         
         // then
-        XCTAssertEqual(cpu.a, 0b0000_1111)
+        XCTAssertEqual(cpu.a, 0b1001_0000)
         XCTAssertFalse(cpu.f.z)
         XCTAssertFalse(cpu.f.n)
         XCTAssertFalse(cpu.f.c)
-        XCTAssertFalse(cpu.f.h)
+        XCTAssertTrue(cpu.f.h)
     }
     
-    func testCarryFlagsShouldBeSetIfHC2() throws {
+    func testHalfCarryFlagsShouldBeSetIfCarryAndHalfCarry() throws {
         // given
         let cpu = CPU()
         
         // when
-        cpu.a = 0b0000_0001
-        cpu.b = 0b0000_1111
+        cpu.a = 0b1000_1111 // 143
+        cpu.b = 0b1000_0001 // 129
         cpu.add(cpu.b)
         
         // then
         XCTAssertEqual(cpu.a, 0b0001_0000)
         XCTAssertFalse(cpu.f.z)
         XCTAssertFalse(cpu.f.n)
-        XCTAssertFalse(cpu.f.c)
-        XCTAssertTrue(cpu.f.h) // wth hc is doin
+        XCTAssertTrue(cpu.f.c)
+        XCTAssertTrue(cpu.f.h)
     }
     
+    func testExecuteShouldRunOperations() throws {
+        let cpu = CPU()
+        
+        cpu.b = 0b1
+        
+        cpu.execute(.ADD(.B))
+        
+        XCTAssertEqual(cpu.a, 0b1)
+    }
     
+//    func testReadByteFromRom() throws {
+//        let fs = FileSystem()
+//        
+//        let data = fs.readRom()
+//        
+//        let f = data[0x0147]
+//        
+//        print(f)
+//        
+//    }
 //
 //    func testExecuteAddShouldDoFalseForOverflowwhenItsNot() throws {
 //        // given
