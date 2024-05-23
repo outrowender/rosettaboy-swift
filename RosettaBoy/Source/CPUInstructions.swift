@@ -102,11 +102,12 @@ extension CPU {
 extension CPU {
     // MARK: - Add
     func add(_ value: UInt8) {
-        let (add, carry) = self.a.addingReportingOverflow(value) // understand carry per bit - reporting overflow
-        self.f.z = add == 0
+        let (add, carry) = self.a.addingReportingOverflow(value)
+        
+        self.f.z = (add == 0)
         self.f.n = false
         self.f.c = carry
-        self.f.h = (self.a & 0xf) + (value & 0xf) + UInt8(carry) > 0xf
+        self.f.h = (self.a & 0xf) + (value & 0xf) > 0xf
         
         self.a = add
     }
